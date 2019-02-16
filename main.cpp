@@ -23,8 +23,8 @@ int main ()
     {
         //RedChannel = buf[0]<<4 | (buf[1] & 0xF0)>>4;
         //GreenChannel = (buf[1] & 0x0F)<<8 | buf[2];
-        RedChannel=buf[0];
-        GreenChannel=((buf[1] & 0xf) << 4) | ((buf[2] >> 4) & 0xf);
+        RedChannel=(uint8_t)buf[0];
+        GreenChannel=((uint8_t)(buf[1] & 0xf) << 4) | ((uint8_t)(buf[2] >> 4) & 0xf);
 
         cout<<"RedChannel: "<<RedChannel<<endl;
         cout<<"GreenChannel: "<<GreenChannel<<endl;
@@ -33,8 +33,8 @@ int main ()
     {
         //GreenChannel = buf[0]<<4 | (buf[1] & 0xF0)>>4;
         //BlueChannel = (buf[1] & 0x0F)<<8 | buf[2];
-        GreenChannel=buf[0];
-        BlueChannel=((buf[1] & 0xf) << 4) | ((buf[2] >> 4) & 0xf);
+        GreenChannel=(uint8_t)buf[0];
+        BlueChannel=((uint8_t)(buf[1] & 0xf) << 4) | ((uint8_t)(buf[2] >> 4) & 0xf);
         cout<<"GreenChannel: "<<GreenChannel<<endl;
         cout<<"BlueChannel: "<<BlueChannel<<endl;
     }
