@@ -17,7 +17,7 @@ int main ()
         cout<<"Failed to open"<<endl;
     }
     unsigned char buf[3];
-    unsigned int RedChannel,GreenChannel,BlueChannel;
+    unsigned int RedChannel,GreenChannel_1,GreenChannel_2,BlueChannel;
     int count=0;
     int i=0;
     while(count<3072)
@@ -30,10 +30,10 @@ int main ()
             while(i<BUFFERSIZE)
             {
                 RedChannel=(uint8_t)buf[i];
-                GreenChannel=((uint8_t)(buf[i+1] & 0xf) << 4) | ((uint8_t)(buf[i+2] >> 4) & 0xf);
-                i+=3
+                GreenChannel_1=((uint8_t)(buf[i+1] & 0x0f) << 4) | ((uint8_t)(buf[i+2] >> 4) & 0x0f);
+                i+=3;
                 cout<<"RedChannel: "<<RedChannel<<endl;
-                cout<<"GreenChannel: "<<GreenChannel<<endl;
+                cout<<"GreenChannel 1: "<<GreenChannel_1<<endl;
             }
 
         
@@ -44,10 +44,10 @@ int main ()
             //BlueChannel = (buf[1] & 0x0F)<<8 | buf[2];
             while(i<BUFFERSIZE)
             {
-                GreenChannel=(uint8_t)buf[0];
-                BlueChannel=((uint8_t)(buf[1] & 0xf) << 4) | ((uint8_t)(buf[2] >> 4) & 0xf);
-                i+=3
-                cout<<"GreenChannel: "<<GreenChannel<<endl;
+                GreenChannel_2=(uint8_t)buf[0];
+                BlueChannel=((uint8_t)(buf[1] & 0x0f) << 4) | ((uint8_t)(buf[2] >> 4) & 0x0f);
+                i+=3;
+                cout<<"GreenChannel 2: "<<GreenChannel_2<<endl;
                 cout<<"BlueChannel: "<<BlueChannel<<endl;
             }
         }
