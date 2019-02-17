@@ -16,24 +16,30 @@ int main ()
     {
         cout<<"Failed to open"<<endl;
     }
-    unsigned char buf[3];
     unsigned int RedChannel,GreenChannel_1,GreenChannel_2,BlueChannel;
-    int count=0;
+    int rowNum=0;
     int i=0;
-    while(count<3072)
+    int pixel=1;
+    while(rowNum<3072)
     {
         infile.read(reinterpret_cast<char*>(bufferRow), BUFFERSIZE);
-        if(count%2==0)
+        if(rowNum%2==0)
         {
             //RedChannel = buf[0]<<4 | (buf[1] & 0xF0)>>4;
             //GreenChannel = (buf[1] & 0x0F)<<8 | buf[2];
             while(i<BUFFERSIZE)
             {
-                RedChannel=(uint8_t)buf[i];
-                GreenChannel_1=((uint8_t)(buf[i+1] & 0x0f) << 4) | ((uint8_t)(buf[i+2] >> 4) & 0x0f);
+                RedChannel=(uint8_t)bufferRow[i];
+                GreenChannel_1=((uint8_t)(bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
                 i+=3;
-                cout<<"RedChannel: "<<RedChannel<<endl;
-                cout<<"GreenChannel 1: "<<GreenChannel_1<<endl;
+                if(pixel<=3 && rowNum<5)
+                {
+                    cout<<"RedChannel: "<<RedChannel<<endl;
+                    if(pixel!=3)
+                        cout<<"GreenChannel 1: "<<GreenChannel_1<<endl;
+                }
+                pixel++;
+
             }
 
         
@@ -44,15 +50,23 @@ int main ()
             //BlueChannel = (buf[1] & 0x0F)<<8 | buf[2];
             while(i<BUFFERSIZE)
             {
-                GreenChannel_2=(uint8_t)buf[0];
-                BlueChannel=((uint8_t)(buf[1] & 0x0f) << 4) | ((uint8_t)(buf[2] >> 4) & 0x0f);
+                GreenChannel_2=(uint8_t)bufferRow[i];
+                BlueChannel=((uint8_t)(bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
                 i+=3;
-                cout<<"GreenChannel 2: "<<GreenChannel_2<<endl;
-                cout<<"BlueChannel: "<<BlueChannel<<endl;
+                if(pixel<=3 && rowNum<5)
+                {
+                    cout<<"GreenChannel 2: "<<GreenChannel_2<<endl;
+                    if(pixel!=3)
+                        cout<<"BlueChannel: "<<BlueChannel<<endl;
+                }
+                pixel++;
             }
         }
-        count++;
+        rowNum++;
         i=0;
+        pixel=1;
+        if(rowNum<5)
+            cout<<" "<<endl;
     }
     infile.close();
 }
