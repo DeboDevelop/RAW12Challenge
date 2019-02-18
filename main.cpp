@@ -4,12 +4,18 @@ using namespace std;
  
 const int BUFFERSIZE = 4096;
 
+struct Collect
+{
+    char r,g,b;
+};
+
 int main () 
 {
     ifstream infile;
     infile.open("portrait.raw12", ios::binary | ios::in);
-    //char buf[3];
-    //char RedChannel,GreenChannel,BlueChannel;
+    ofstream outfile;
+    outfile.open("Redone.ppm", ios::binary);
+    outfile << "P6\n" << 1536 << "\n" << 2048 << "\n255\n";
     uint8_t * bufferRow = new uint8_t[BUFFERSIZE];
 
     if(!infile)
@@ -25,13 +31,19 @@ int main ()
         infile.read(reinterpret_cast<char*>(bufferRow), BUFFERSIZE);
         if(rowNum%2==0)
         {
-            //RedChannel = buf[0]<<4 | (buf[1] & 0xF0)>>4;
-            //GreenChannel = (buf[1] & 0x0F)<<8 | buf[2];
             while(i<BUFFERSIZE)
             {
                 RedChannel=(uint8_t)bufferRow[i];
                 GreenChannel_1=((uint8_t)(bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
                 i+=3;
+                Collect s;
+                s.r=(char)RedChannel;
+                s.g=(char)0;
+                s.b=(char)0;
+                unsigned char c = (unsigned char)(255.0f * (float)RedChannel + 0.5f); 
+                //outfile.write((char*) &c, 3);
+                //outfile.write((char*) 255, sizeof(c));
+                outfile.write(reinterpret_cast<char* >(&s), sizeof(Collect));
                 if(pixel<=3 && rowNum<5)
                 {
                     cout<<"RedChannel: "<<RedChannel<<endl;
@@ -41,13 +53,11 @@ int main ()
                 pixel++;
 
             }
-
+            outfile<<"\n";
         
         }
         else
         {
-            //GreenChannel = buf[0]<<4 | (buf[1] & 0xF0)>>4;
-            //BlueChannel = (buf[1] & 0x0F)<<8 | buf[2];
             while(i<BUFFERSIZE)
             {
                 GreenChannel_2=(uint8_t)bufferRow[i];
@@ -69,5 +79,6 @@ int main ()
             cout<<" "<<endl;
     }
     infile.close();
+    outfile.close();
 }
     
