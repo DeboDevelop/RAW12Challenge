@@ -1,101 +1,103 @@
 #include <fstream>
+#include <cstdlib>
 #include <iostream>
 using namespace std;
- 
-const int BUFFERSIZE = 4096;
 
-struct Collect
-{
-    char r,g,b;
-};
+// Enough for one line of the input image
+const int BUFFERSIZE = 4096 * 3;
 
-int main () 
-{
+int main(){
+
     ifstream infile;
+    ofstream redfile;
+    ofstream greenfile1;
+    ofstream greenfile2;
+    ofstream bluefile;
+
     infile.open("portrait.raw12", ios::binary | ios::in);
-    ofstream outfile;
-    outfile.open("Redtwo.ppm", ios::binary);
-    /*
-    outfile.write("P6 ", 3);
-    outfile.write("1536 2048 ", 8);
-    outfile.write("2048 ", 4);
-    outfile.write("255 ", 4);
-    */
-    //outfile << "P6\n" << 1536 << "\n" << 2048 << "\n255\n";
-    outfile << "P6"     << "\n"
-        << 1536  << " "
-        << 2048  << "\n"
-        << 255   << "\n"
-       ;
-    uint8_t * bufferRow = new uint8_t[BUFFERSIZE];
+    redfile.open("Red Channel.pgm", ios::binary);
+    greenfile1.open("Green Channel1.pgm", ios::binary);
+    greenfile2.open("Green Channel2.pgm", ios::binary);
+    bluefile.open("Blue Channel.pgm", ios::binary);
+
+    // Write single channel PGM file
+    redfile << "P5\n2048 1536\n255\n";
+    greenfile1 << "P5\n2048 1536\n255\n";
+    greenfile2 << "P5\n2048 1536\n255\n";
+    bluefile << "P5\n2048 1536\n255\n";
+    //To store input
+    unsigned char * bufferRow = new unsigned char[BUFFERSIZE];
 
     if(!infile)
     {
         cout<<"Failed to open"<<endl;
+        return 0;
     }
-    int size=1536*2048*3;
-    char * RedChannel=new char[size];
-    int GreenChannel_1,GreenChannel_2,BlueChannel;
-    int rowNum=0;
-    int i=0;
-    int j=0;
+    int size=2048*1536;
+    //Array to store the R,G,G,B Channels
+    unsigned char * RedChannel=new unsigned char[size];
+    unsigned char * GreenChannel_1=new unsigned char[size];
+    unsigned char * GreenChannel_2=new unsigned char[size];
+    unsigned char * BlueChannel=new unsigned char[size];
+    //pointers of the array declared above.
+    unsigned char * Redp = RedChannel;
+    unsigned char * Greenp_1=GreenChannel_1;
+    unsigned char * Greenp_2=GreenChannel_2;
+    unsigned char * Bluep=BlueChannel;
+    //useful for printing
     int pixel=1;
-    while(rowNum<3072)
+    int temp=0;
+
+    for(int rowNum=0;rowNum<1536;rowNum++)
     {
+        // Read an entire row
         infile.read(reinterpret_cast<char*>(bufferRow), BUFFERSIZE);
         if(rowNum%2==0)
         {
-            while(i<BUFFERSIZE)
+            for(int i=0;i<BUFFERSIZE;i+=3)
             {
-                RedChannel[j]=(uint8_t)bufferRow[i];
-                GreenChannel_1=((uint8_t)(bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
-                i+=3;
-                Collect s;
-                //s.r=(char)RedChannel[j];
-                //s.g=(char)0;
-                //s.b=(char)0;
-                //unsigned char c = (unsigned char)(255.0f * (float)RedChannel[j] + 0.5f); 
-                //outfile.write((char*) &c, 3);
-                //outfile.write((char*) 255, sizeof(c));
-                //outfile.write(reinterpret_cast<char*>(&RedChannel), 4);
+                *Redp++=bufferRow[i];
+                *Greenp_1++=((uint8_t)(bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
                 if(pixel<=3 && rowNum<5)
                 {
-                    cout<<"RedChannel: "<<RedChannel[j]<<endl;
+                    temp=(uint8_t)bufferRow[i];
+                    cout<<"RedChannel: "<<temp<<endl;
                     if(pixel!=3)
-                        cout<<"GreenChannel 1: "<<GreenChannel_1<<endl;
+                        temp=((uint8_t)(bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
+                        cout<<"GreenChannel 1: "<<temp<<endl;
                 }
                 pixel++;
-                j++;
-
             }
-            RedChannel[j]='\n';
-            j++;
-        
         }
         else
         {
-            while(i<BUFFERSIZE)
+            for(int i=0;i<BUFFERSIZE;i+=3)
             {
-                GreenChannel_2=(uint8_t)bufferRow[i];
-                BlueChannel=((uint8_t)(bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
-                i+=3;
+                *Greenp_2++=bufferRow[i];
+                *Bluep++=((uint8_t)(bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
+
                 if(pixel<=3 && rowNum<5)
                 {
-                    cout<<"GreenChannel 2: "<<GreenChannel_2<<endl;
+                    temp=(uint8_t)bufferRow[i];
+                    cout<<"GreenChannel 2: "<<temp<<endl;
                     if(pixel!=3)
-                        cout<<"BlueChannel: "<<BlueChannel<<endl;
+                        temp=(((uint8_t)bufferRow[i+1] & 0x0F) << 4) | ((uint8_t)(bufferRow[i+2] >> 4) & 0x0F);
+                        cout<<"BlueChannel 1: "<<temp<<endl;
                 }
                 pixel++;
             }
         }
-        rowNum++;
-        i=0;
         pixel=1;
         if(rowNum<5)
             cout<<" "<<endl;
     }
     infile.close();
-    outfile.write(RedChannel, size);
-    outfile.close();
+    redfile.write(reinterpret_cast<char*>(RedChannel), size);
+    greenfile1.write(reinterpret_cast<char*>(GreenChannel_1), size);
+    greenfile2.write(reinterpret_cast<char*>(GreenChannel_2), size);
+    bluefile.write(reinterpret_cast<char*>(BlueChannel), size);
+    redfile.close();
+    greenfile1.close();
+    greenfile2.close();
+    bluefile.close();
 }
-    
